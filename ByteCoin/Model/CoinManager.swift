@@ -8,6 +8,11 @@
 
 import Foundation
 
+protocol CoinManagerDelegate {
+    func didUpdateCoinData(response : CoinModel)
+    func didFindError(error : Error)
+}
+
 struct CoinManager {
     
     let baseURL = "rest.coinapi.io"
@@ -15,18 +20,19 @@ struct CoinManager {
     
     let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
 
+    var delegate : CoinManagerDelegate?
     
-    func getCoinPrice(for currency: String) -> Double{
+    func getCoinPrice(for currency: String) {
         if var urlComps = URLComponents(string: baseURL) {
             let queryItems = [URLQueryItem(name: "apikey", value: apiKey)]
             urlComps.scheme = "https"
             urlComps.host = baseURL
-            urlComps.path = "/v1/exchangerate/BTC/\(currencyArray[19])"
+            urlComps.path = "/v1/exchangerate/BTC/\(currency)"
             urlComps.queryItems = queryItems
             let session = URLSession(configuration: .default)
             let task = session.dataTask(with: urlComps.url!) { (data, response, error) in
                 if(error != nil) {
-                    print(error!)
+                    self.delegate?.didFindError(error: error!)
                 }
                 
                 if let responseData = data {
@@ -36,7 +42,6 @@ struct CoinManager {
             
             task.resume()
         }
-        return 0.0
     }
     
     func parseJSON(response: Data) {
@@ -45,9 +50,9 @@ struct CoinManager {
             let decodedData = try decoder.decode(CoinData.self, from: response)
             
             let coin = CoinModel(rate: decodedData.rate, from: decodedData.asset_id_base, to: decodedData.asset_id_quote)
-            print(coin)
+            self.delegate?.didUpdateCoinData(response: coin)
         } catch {
-            print(error)
+            self.delegate?.didFindError(error: error)
         }
     }
 }

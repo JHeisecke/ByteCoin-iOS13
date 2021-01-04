@@ -14,12 +14,13 @@ class CoinBaseViewController: UIViewController  {
     @IBOutlet weak var currency: UILabel!
     @IBOutlet weak var pickerView: UIPickerView!
     
-    let coinManager = CoinManager()
+    var coinManager = CoinManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         pickerView.dataSource = self
         pickerView.delegate = self
+        coinManager.delegate = self
     }
 
     
@@ -43,6 +44,18 @@ extension CoinBaseViewController : UIPickerViewDataSource, UIPickerViewDelegate 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let pickedCurrency = coinManager.currencyArray[row]
         currency.text = pickedCurrency
-        amount.text = String(coinManager.getCoinPrice(for: pickedCurrency))
+        coinManager.getCoinPrice(for: pickedCurrency)
     }
+}
+
+extension CoinBaseViewController : CoinManagerDelegate {
+    func didUpdateCoinData(response: CoinModel) {
+        amount.text = String(response.rate)
+    }
+    
+    func didFindError(error: Error) {
+        print(error)
+    }
+    
+    
 }
