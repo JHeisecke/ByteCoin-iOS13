@@ -43,14 +43,17 @@ extension CoinBaseViewController : UIPickerViewDataSource, UIPickerViewDelegate 
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let pickedCurrency = coinManager.currencyArray[row]
-        currency.text = pickedCurrency
+        
         coinManager.getCoinPrice(for: pickedCurrency)
     }
 }
 
 extension CoinBaseViewController : CoinManagerDelegate {
     func didUpdateCoinData(response: CoinModel) {
-        amount.text = String(response.rate)
+        DispatchQueue.main.async {
+            self.currency.text = response.to
+            self.amount.text = String(response.rate)
+        }
     }
     
     func didFindError(error: Error) {
