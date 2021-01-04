@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  CoinBaseViewController.swift
 //  ByteCoin
 //
 //  Created by Angela Yu on 11/09/2019.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController  {
+class CoinBaseViewController: UIViewController  {
     
     @IBOutlet weak var amount: UILabel!
     @IBOutlet weak var currency: UILabel!
@@ -25,7 +25,7 @@ class ViewController: UIViewController  {
     
 }
 
-extension ViewController : UIPickerViewDataSource, UIPickerViewDelegate {
+extension CoinBaseViewController : UIPickerViewDataSource, UIPickerViewDelegate {
  
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -43,5 +43,6 @@ extension ViewController : UIPickerViewDataSource, UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let pickedCurrency = coinManager.currencyArray[row]
         currency.text = pickedCurrency
+        amount.text = String(coinManager.getCoinPrice(for: pickedCurrency))
     }
 }
